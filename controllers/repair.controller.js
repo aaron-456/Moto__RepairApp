@@ -26,12 +26,14 @@ exports.findOneRepair = async (req, res) => {
 };
 
 exports.createAppointment = async (req, res) => {
-  const { date, status, userId } = req.body;
+  const { sessionUser } = req;
+  const { date, description, motorsNumber } = req.body;
 
   const repairs = await Repair.create({
     date,
-    status,
-    userId,
+    userId: sessionUser.id,
+    description,
+    motorsNumber,
   });
 
   res.status(201).json({
@@ -42,30 +44,13 @@ exports.createAppointment = async (req, res) => {
 };
 
 exports.updateRepair = async (req, res) => {
-  const { id } = req.params;
-
-  const repair = await Repair.findOne({
-    where: {
-      id,
-      status: 'pending',
-    },
-  });
-  // await repair.update({
-  //   status,
-  // });
-
-  console.log(req.params);
-  res.status(200).json({
-    status: 'success',
-    message:
-      'Your application has been updated successfully',
-  });
-
-  const { status } = req.body;
+  const { repair } = req;
 
   await repair.update({ status: 'completed' });
-  res.json({
-    status,
+
+  res.status(200).json({
+    status: 'success',
+    message: 'Your application has been updated successfully',
   });
 };
 
